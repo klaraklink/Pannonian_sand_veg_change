@@ -4,6 +4,8 @@
 
 Klinkovská, K., Axmanová, I., Borovyk, D., Ćuk, M., Kopčan, B., Valachovič, M., Clark, A. T. & Chytrý, M. (2025) Vegetation remains, specialists fade: changes in Pannonian sand grasslands. Preslia.
 
+[![DOI](https://zenodo.org/badge/1017296233.svg)](https://doi.org/10.5281/zenodo.16258179)
+
 ### Data
 
 The data contains vascular plant species composition data from resurveyed vegetation plots of sand vegetation in the Vienna Basin (Czech Republic, Slovakia, Austria, 48°12'–48°58'N, 16°39'–17°19'E). The dataset consists of 86 vegetation plots first surveyed between 1952 and 2010 (with the most plots sampled in 1994–1997 and 2001–2006) and resurveyed in 2023–2024. The historical plots were relocated using the geographical coordinates where available, original locality descriptions, and information on slope, aspect and elevation. We measured the geographical coordinates of each plot using GPS with a location uncertainty of 2–5 m. In 2024, most of the plots were also located using a differential GPS with an accuracy of ca. 5 cm in each corner of the plot. Most plots were squares of 16 m^2^ in the Czech Republic, 25 m^2^ in Slovakia and 100 m^2^ in Austria. During the repeated sampling, we always used the same plot size as in the first sampling.
