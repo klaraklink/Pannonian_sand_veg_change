@@ -22,7 +22,7 @@ combine.cover <- function(x){
 
 # load data ---------------------------------------------------------------
 
-head <- read_csv('data/head_resurvey_paired.csv') |> 
+head <- read_csv('data/pannonian_sands_resurvey_head.csv') |> 
   left_join(read_csv('data/classification.csv')) |> 
   group_by(rs_plot) |> 
   fill(cluster, .direction = 'updown') |> 
@@ -37,7 +37,7 @@ vernal_geo <- tibble(valid_name = c('Gagea pratensis agg.', 'Muscari neglectum',
                                     'Ornithogalum umbellatum agg.', 'Poa bulbosa', 
                                     'Neotinea ustulata'))
 
-spe <- read_csv('data/spe_resurvey_paired.csv') |> 
+spe <- read_csv('data/pannonian_sands_resurvey_spe.csv') |> 
   semi_join(head) |> 
   arrange(releve_nr) |> 
   filter(is.na(exclude)) |> 
@@ -200,7 +200,7 @@ P_max
 # for vegetation types separately -------------------------------------------
 
 head2 <- head |> 
-  filter(cluster == 'Festucion valesiacae') # change accordign to vegetation type
+  filter(cluster == 'Festucion valesiacae') # change according to vegetation type
 
 # species data to wide format for weimea, pa data for unweighted mean
 spe_pa <- spe |> 

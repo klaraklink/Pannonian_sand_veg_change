@@ -35,7 +35,7 @@ to_wide <- function(data_long){
 
 # load data ---------------------------------------------------------------
 
-head <- read_csv('data/head_resurvey_paired.csv') |> 
+head <- read_csv('data/pannonian_sands_resurvey_head.csv') |> 
   left_join(read_csv('data/classification.csv')) |> 
   group_by(rs_plot) |> 
   fill(cluster, .direction = 'updown') |> 
@@ -52,7 +52,7 @@ vernal_geo <- tibble(valid_name = c('Gagea pratensis agg.', 'Muscari neglectum',
                                     'Ornithogalum umbellatum agg.', 'Poa bulbosa', 
                                     'Neotinea ustulata'))
 
-spe <- read_csv('data/spe_resurvey_paired.csv') |> 
+spe <- read_csv('data/pannonian_sands_resurvey_spe.csv') |> 
   semi_join(head) |> 
   mutate(n = n(), .by = 'valid_name') |> 
   filter(is.na(exclude) & n > 1) |> 
@@ -63,6 +63,9 @@ spe <- read_csv('data/spe_resurvey_paired.csv') |>
   
 glimpse(spe)
 glimpse(head)
+
+write_csv(spe, 'data/sands_spe_long.csv')
+write_csv(head, 'data/sands_head.csv')
 
 # data preparation
 spe_wide <- spe |> 
@@ -103,7 +106,7 @@ labs <- paste0('PCo', 1:9, ' (', round(eigenvals(pcoa)/sum(eigenvals(pcoa)) * 10
 head_ord <- bind_cols(head, as_tibble(scores(pcoa, choices = 1:3)$sites)) 
 
 # ordination plot 
-pcoa_si <- head_ord %>%
+pcoa_si <- head_ord |>
   ggplot(aes(MDS1, MDS2)) +
   geom_point(aes(fill = cluster, shape = time),
              size = 3) +
@@ -121,7 +124,7 @@ pcoa_si <- head_ord %>%
   labs(x = labs[1], y = labs[2])
 
 # ordination plot 
-pcoa_si_time <- head_ord %>%
+pcoa_si_time <- head_ord |>
   arrange(rs_plot, year) |> 
   mutate(year_diff = year - lag(year), .by = (rs_plot)) |> 
   fill(year_diff, .direction = 'updown') |>
@@ -144,14 +147,14 @@ pcoa_si_time <- head_ord %>%
 spe_fit_pcoa <- envfit(pcoa, spe_wide, display = 'si', choices = 1:2, permutations = 0) 
 
 spe_pcoa <- as_tibble(scores(pcoa, display = 'species', scaling='si', correlation=T), 
-                      rownames = 'species_name') %>% 
+                      rownames = 'species_name') |> 
   mutate(r = spe_fit_pcoa$vectors$r, # goodness of fit
          short_name = str_c(str_split_i(species_name, '\\s', 1) %>% str_sub(., 1, 3), # make short species names Genus species -> Gen.spe
                             str_split_i(species_name, '\\s', 2) %>% str_sub(., 1, 3), sep = '.'))
 
 # ordination plot with species
-pcoa_spe <- spe_pcoa %>% 
-  slice_max(r, n = 25) %>% # select 40 best-fitting species
+pcoa_spe <- spe_pcoa |> 
+  slice_max(r, n = 25) |> # select 40 best-fitting species
   ggplot() + 
   geom_segment(aes(x = 0, y = 0, xend = MDS1, yend = MDS2), alpha = 0.6, 
                arrow = arrow(length = unit(0.2, 'cm')), show.legend = F)+ # arrows for species
@@ -161,8 +164,8 @@ pcoa_spe <- spe_pcoa %>%
   labs(x = labs[1], y = labs[2])
 
 # bind together ordination plots for sites and species
-pcoa_si + pcoa_spe + plot_annotation(title = 'PCoA, All vegetation types (n = 86)', tag_levels = 'A')
-ggsave('plots/pcoa_cluster.png', width = 12, height = 6)
+pcoa_si / pcoa_spe + plot_annotation(title = 'PCoA, All vegetation types (n = 86)', tag_levels = 'A')
+ggsave('plots/pcoa_cluster.png', width = 6, height = 12)
 
 # clusters separately ----------------------------------------------------
 
@@ -174,7 +177,7 @@ labs <- paste0('PCo', 1:9, ' (', round(eigenvals(pcoa_cory)/sum(eigenvals(pcoa_c
 head_ord_cory <- bind_cols(head_cory, as_tibble(scores(pcoa_cory)$sites)) 
 
 # ordination plot 
-pcoa_si_cory <- head_ord_cory %>%
+pcoa_si_cory <- head_ord_cory |>
   ggplot(aes(MDS1, MDS2)) +
   geom_point(aes(fill = time, shape = time),
              size = 3) +
@@ -196,14 +199,14 @@ pcoa_si_cory <- head_ord_cory %>%
 spe_fit_pcoa_cory <- envfit(pcoa_cory, spe_wide_cory, display = 'si', choices = 1:2, permutations = 0) 
 
 spe_pcoa_cory <- as_tibble(scores(pcoa_cory, display = 'species', scaling='si', correlation=T), 
-                      rownames = 'species_name') %>% 
+                      rownames = 'species_name') |> 
   mutate(r = spe_fit_pcoa_cory$vectors$r, # goodness of fit
          short_name = str_c(str_split_i(species_name, '\\s', 1) %>% str_sub(., 1, 3), # make short species names Genus species -> Gen.spe
                             str_split_i(species_name, '\\s', 2) %>% str_sub(., 1, 3), sep = '.'))
 
 # ordination plot with species
-pcoa_spe_cory <- spe_pcoa_cory %>% 
-  slice_max(r, n = 25) %>% # select 40 best-fitting species
+pcoa_spe_cory <- spe_pcoa_cory |> 
+  slice_max(r, n = 25) |> # select 40 best-fitting species
   ggplot() + 
   geom_segment(aes(x = 0, y = 0, xend = MDS1, yend = MDS2), alpha = 0.6, 
                arrow = arrow(length = unit(0.2, 'cm')), show.legend = F)+ # arrows for species
@@ -226,7 +229,7 @@ labs <- paste0('PCo', 1:9, ' (', round(eigenvals(pcoa_arm)/sum(eigenvals(pcoa_ar
 head_ord_arm <- bind_cols(head_arm, as_tibble(scores(pcoa_arm)$sites)) 
 
 # ordination plot 
-pcoa_si_arm <- head_ord_arm %>%
+pcoa_si_arm <- head_ord_arm |>
   ggplot(aes(MDS1, MDS2)) +
   geom_point(aes(fill = time, shape = time),
              size = 3) +
@@ -246,14 +249,14 @@ pcoa_si_arm <- head_ord_arm %>%
 spe_fit_pcoa_arm <- envfit(pcoa_arm, spe_wide_arm, display = 'si', choices = 1:2, permutations = 0) 
 
 spe_pcoa_arm <- as_tibble(scores(pcoa_arm, display = 'species', scaling='si', correlation=T), 
-                         rownames = 'species_name') %>% 
+                         rownames = 'species_name') |> 
   mutate(r = spe_fit_pcoa_arm$vectors$r, # goodness of fit
          short_name = str_c(str_split_i(species_name, '\\s', 1) %>% str_sub(., 1, 3), # make short species names Genus species -> Gen.spe
                             str_split_i(species_name, '\\s', 2) %>% str_sub(., 1, 3), sep = '.'))
 
 # ordination plot with species
-pcoa_spe_arm <- spe_pcoa_arm %>% 
-  slice_max(r, n = 25) %>% # select 40 best-fitting species
+pcoa_spe_arm <- spe_pcoa_arm |> 
+  slice_max(r, n = 25) |> # select 40 best-fitting species
   ggplot() + 
   geom_segment(aes(x = 0, y = 0, xend = MDS1, yend = MDS2), alpha = 0.6, 
                arrow = arrow(length = unit(0.2, 'cm')), show.legend = F)+ # arrows for species
@@ -275,7 +278,7 @@ labs <- paste0('PCo', 1:9, ' (', round(eigenvals(pcoa_fesval)/sum(eigenvals(pcoa
 head_ord_fesval <- bind_cols(head_fesval, as_tibble(scores(pcoa_fesval)$sites)) 
 
 # ordination plot 
-pcoa_si_fesval <- head_ord_fesval %>%
+pcoa_si_fesval <- head_ord_fesval |>
   ggplot(aes(MDS1, MDS2)) +
   geom_point(aes(fill = time, shape = time),
              size = 3) +
@@ -295,14 +298,14 @@ pcoa_si_fesval <- head_ord_fesval %>%
 spe_fit_pcoa_fesval <- envfit(pcoa_fesval, spe_wide_fesval, display = 'si', choices = 1:2, permutations = 0) 
 
 spe_pcoa_fesval <- as_tibble(scores(pcoa_fesval, display = 'species', scaling='si', correlation=T), 
-                         rownames = 'species_name') %>% 
+                         rownames = 'species_name') |> 
   mutate(r = spe_fit_pcoa_fesval$vectors$r, # goodness of fit
          short_name = str_c(str_split_i(species_name, '\\s', 1) %>% str_sub(., 1, 3), # make short species names Genus species -> Gen.spe
                             str_split_i(species_name, '\\s', 2) %>% str_sub(., 1, 3), sep = '.'))
 
 # ordination plot with species
-pcoa_spe_fesval <- spe_pcoa_fesval %>% 
-  slice_max(r, n = 25) %>% # select 40 best-fitting species
+pcoa_spe_fesval <- spe_pcoa_fesval |> 
+  slice_max(r, n = 25) |> # select 40 best-fitting species
   ggplot() + 
   geom_segment(aes(x = 0, y = 0, xend = MDS1, yend = MDS2), alpha = 0.6, 
                arrow = arrow(length = unit(0.2, 'cm')), show.legend = F)+ # arrows for species
@@ -332,9 +335,9 @@ dbrda_spe <- envfit(dbrda, spe_wide, choices = 1,
                    permutations = how(blocks = as.factor(head$rs_plot), nperm = 999), display = "lc")
 
 # filter species significantly correlated with the constrained axis
-sig_spe <- as_tibble(dbrda_spe$vectors$arrows, rownames = "SpecName_Layer") %>% 
-  bind_cols(p = dbrda_spe$vectors$pvals, r = dbrda_spe$vectors$r)  %>%  
-  filter(p < 0.05) %>% 
+sig_spe <- as_tibble(dbrda_spe$vectors$arrows, rownames = "SpecName_Layer") |> 
+  bind_cols(p = dbrda_spe$vectors$pvals, r = dbrda_spe$vectors$r)  |>  
+  filter(p < 0.05) |> 
   arrange(CAP1, p) |> 
   write_csv('results/increasing_decreasing_species_all.csv')
 
@@ -354,9 +357,9 @@ dbrda_spe_fesval <- envfit(dbrda_fesval, spe_wide_fesval, choices = 1,
                     permutations = how(blocks = as.factor(head_fesval$rs_plot), nperm = 999), display = "lc")
 
 # filter species significantly correlated with the constrained axis
-sig_spe_fesval <- as_tibble(dbrda_spe_fesval$vectors$arrows, rownames = "SpecName_Layer") %>% 
-  bind_cols(p = dbrda_spe_fesval$vectors$pvals, r = dbrda_spe_fesval$vectors$r)  %>%  
-  filter(p < 0.05) %>% 
+sig_spe_fesval <- as_tibble(dbrda_spe_fesval$vectors$arrows, rownames = "SpecName_Layer") |> 
+  bind_cols(p = dbrda_spe_fesval$vectors$pvals, r = dbrda_spe_fesval$vectors$r)  |>  
+  filter(p < 0.05) |> 
   arrange(CAP1, p)|> 
   write_csv('results/increasing_decreasing_species_fesval.csv')
 
@@ -376,9 +379,9 @@ dbrda_spe_arm <- envfit(dbrda_arm, spe_wide_arm, choices = 1,
                        permutations = how(blocks = as.factor(head_arm$rs_plot), nperm = 999), display = "lc")
 
 # filter species significantly correlated with the constrained axis
-sig_spe_arm <- as_tibble(dbrda_spe_arm$vectors$arrows, rownames = "SpecName_Layer") %>% 
-  bind_cols(p = dbrda_spe_arm$vectors$pvals, r = dbrda_spe_arm$vectors$r)  %>%  
-  filter(p < 0.05) %>% 
+sig_spe_arm <- as_tibble(dbrda_spe_arm$vectors$arrows, rownames = "SpecName_Layer") |> 
+  bind_cols(p = dbrda_spe_arm$vectors$pvals, r = dbrda_spe_arm$vectors$r)  |>  
+  filter(p < 0.05) |> 
   arrange(CAP1, p) |> 
   write_csv('results/increasing_decreasing_species_arm.csv')
 
@@ -397,15 +400,11 @@ dbrda_spe_cory <- envfit(dbrda_cory, spe_wide_cory, choices = 1,
                        permutations = how(blocks = as.factor(head_cory$rs_plot), nperm = 999), display = "lc")
 
 # filter species significantly correlated with the constrained axis
-sig_spe_cory <- as_tibble(dbrda_spe_cory$vectors$arrows, rownames = "SpecName_Layer") %>% 
-  bind_cols(p = dbrda_spe_cory$vectors$pvals, r = dbrda_spe_cory$vectors$r)  %>%  
-  filter(p < 0.05) %>% 
+sig_spe_cory <- as_tibble(dbrda_spe_cory$vectors$arrows, rownames = "SpecName_Layer") |> 
+  bind_cols(p = dbrda_spe_cory$vectors$pvals, r = dbrda_spe_cory$vectors$r)  |>  
+  filter(p < 0.05) |> 
   arrange(CAP1, p) |> 
   write_csv('results/increasing_decreasing_species_cory.csv')
-
-dbrda_all + dbrda_cory + dbrda_arm + dbrda_fesval
-ggsave('plots/dbrda_time_clusters.png', width = 12, height = 12) 
-
 
 # shortcuts of species names
 spe_pcoa |> 
@@ -442,6 +441,13 @@ spe_freq_cl <- spe |>
   write_csv('results/spe_freq_cluster.csv')
 
 
+spe_abu <- spe |> 
+  left_join(head) |> 
+  group_by(valid_name, time) |> 
+  summarise(n = sum(to_br_bl_old), .groups = 'drop') |> 
+  arrange(valid_name, desc(n)) |> 
+  pivot_wider(names_from = time, values_from = n, values_fill = 0)
+
 # dissimilarity between the old and new plots vs interval length ----------
 
 dissim <- head |> 
@@ -452,14 +458,14 @@ dissim <- head |>
   select(-old, -new) 
 
 # Join metadata to species data
-data_combined <- head %>%
+data_combined <- head |>
   select(releve_nr, rs_plot) |> 
   bind_cols(spe_wide)
 
 # Nest by pair_id to create sub-tibbles of 2 plots each
-results <- data_combined %>%
-  group_by(rs_plot) %>%
-  nest() %>%
+results <- data_combined |>
+  group_by(rs_plot) |>
+  nest() |>
   mutate(
     bray_curtis = map_dbl(data, ~ {
       sp_data <- select(.x, -rs_plot, -releve_nr)
@@ -467,7 +473,7 @@ results <- data_combined %>%
     }),
     plot1 = map_chr(data, ~ .x$releve_nr[1]),
     plot2 = map_chr(data, ~ .x$releve_nr[2])
-  ) %>%
+  ) |>
   select(rs_plot, plot1, plot2, bray_curtis) |> 
   left_join(head |> 
               select(rs_plot, year, time) |> 
@@ -491,6 +497,5 @@ m1 <- lm(bray_curtis ~ time_diff, data = results2)
 
 summary(m1)
 anova(m1)
-tidy(m2, conf.int = T)
 
 

@@ -27,7 +27,7 @@ combine.cover <- function(x){
 
 # load data ---------------------------------------------------------------
 
-head <- read_csv('data/head_resurvey_paired.csv') |> 
+head <- read_csv('data/pannonian_sands_resurvey_head.csv') |> 
   filter(!is.na(rs_plot)) |> 
   left_join(read_csv('data/classification.csv')) |> 
   group_by(rs_plot) |> 
@@ -42,7 +42,7 @@ vernal_geo <- tibble(valid_name = c('Gagea pratensis agg.', 'Muscari neglectum',
                 'Ornithogalum umbellatum agg.', 'Poa bulbosa', 
                 'Neotinea ustulata'))
 
-spe <- read_csv('data/spe_resurvey_paired.csv') |> 
+spe <- read_csv('data/pannonian_sands_resurvey_spe.csv') |> 
   semi_join(head) |> 
   filter(is.na(exclude)) |> 
   summarise(to_br_bl_old = combine.cover(to_br_bl_old), .by = c('releve_nr', 'valid_name')) |> 
@@ -53,11 +53,11 @@ spe <- read_csv('data/spe_resurvey_paired.csv') |>
 glimpse(spe)
 glimpse(head)
 
-diag <- read_csv('data/diag_czskat.csv') 
+diag <- read_csv('data/diag.csv') 
 
-aliens <- read_xlsx('data/species_sands_czskat-2025-01-16-IA.xlsx') 
+aliens <- read_xlsx('data/aliens.xlsx') 
 
-redlist <- read_csv('data/red_list_czskat.csv') |> 
+redlist <- read_csv('data/red_list.csv') |> 
   mutate(RegionFloraVeg = case_when(RegionFloraVeg == 'Czechia' ~ 'CZ', 
                                     RegionFloraVeg == 'Slovakia' ~ 'SK',
                                     RegionFloraVeg == 'Austria' ~ 'AT'), 
@@ -178,11 +178,6 @@ anova(m1)
 tidy(m1, conf.int = T) -> mm
 plot(m1)
 
-# significant change in time, increasing number of species over time 
-# in Arm grasslands significantly more species per plot than in Cory
-# in Fes.val, species richness is significantly more increasing over time than in Cory and Arm
-
-
 # sand specialists -------------------------------------------------------------
 
 # boxplot sand specialists
@@ -204,9 +199,6 @@ summary(m2)
 anova(m2)
 tidy(m2, conf.int = T) |> mutate(estimate = exp(estimate)/(1+exp(estimate)))
 plot(m2)
-
-# significant decline over time
-# in Cory significantly more sand specialists than in Arm and Fesval and significantly more decreasing
 
 # dry grassland specialists -------------------------------------------------------------
 
@@ -230,9 +222,6 @@ anova(m3)
 tidy(m3, conf.int = T) |> mutate(estimate = exp(estimate)/(1+exp(estimate)))
 plot(m3)
 
-# significant decrease over time
-# significantly more dry grassland specialists in Arm and Fes.val than in Cory
-
 # ruderal species -------------------------------------------------------------
 
 # boxplot ruderal species
@@ -253,9 +242,6 @@ summary(m4)
 anova(m4)
 tidy(m4, conf.int = T) |> mutate(estimate = exp(estimate)/(1+exp(estimate)))
 plot(m4)
-
-# significant increase of ruderal species over time
-# significantly higher proportion of ruderal species in Cory than in Arm and Fes.val
 
 # Red-List species -----------------------------------------------------------
 
@@ -278,9 +264,6 @@ anova(m5)
 tidy(m5, conf.int = T) 
 plot(m5)
 
-predict_response(m6,  terms = c('cluster', 'time')) |> plot()
-
-
 # alien species -----------------------------------------------------------
 
 # boxplot alien
@@ -299,8 +282,6 @@ summary(m6)
 anova(m6)
 tidy(m6, conf.int = T) 
 plot(m6)
-
-# significantly higher proportion of alien species in Cory than in Arm and Fes.val
 
 # woody species -----------------------------------------------------------
 
@@ -335,7 +316,7 @@ ggsave('plots/boxplots_clusters.png', width = 8, height = 10)
 
 
 #  trend magnitude vs interval length -----------------------------------------
-# makes sense onlu for Corynephorion
+# makes sense only for Corynephorion
 
 ### richness
 head5 <- head3 |> 
@@ -351,9 +332,7 @@ summary(m8)
 anova(m8)
 tidy(m8, conf.int = T)
 
-# not significant
-
-### specialists
+# specialists
 head5$prop_sand_diff |> hist()
 
 m9 <- lm(prop_sand_diff ~ year_diff, data = head5)
@@ -362,28 +341,28 @@ summary(m9)
 anova(m9)
 tidy(m9, conf.int = T)
 
-### dry grassland specialists
+# dry grassland specialists
 m10 <- lm(prop_grass_diff ~ year_diff, data = head5)
 
 summary(m10)
 anova(m10)
 tidy(m10, conf.int = T)
 
-### ruderal species
+# ruderal species
 m11 <- lm(prop_ruderal_diff ~ year_diff, data = head5)
 
 summary(m11)
 anova(m11)
 tidy(m11, conf.int = T)
 
-### red list species
+# red list species
 m12 <- lm(prop_redlist_diff ~ year_diff, data = head5)
 
 summary(m12)
 anova(m12)
 tidy(m12, conf.int = T)
 
-### alien species
+# alien species
 head5$prop_alien_diff |> hist()
 
 m13 <- lm(prop_alien_diff ~ year_diff, data = head5)
@@ -392,7 +371,7 @@ summary(m13)
 anova(m13)
 tidy(m13, conf.int = T)
 
-### woody species
+# woody species
 m14 <- lm(prop_woody_diff ~ year_diff, data = head5)
 
 summary(m14)

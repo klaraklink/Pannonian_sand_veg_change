@@ -1,5 +1,6 @@
 library(isopam) # v. 2.0
 library(vegan) # v. 2.6-8
+library(cluster) # v. 2.1.8.1
 library(indicspecies) # v. 1.7.15
 library(factoextra) # v. 1.0.7
 library(tidyverse) # v. 2.0.0
@@ -35,11 +36,11 @@ to_wide <- function(data_long){
 # load data ---------------------------------------------------------------
 
 # only old plots for classification
-head <- read_csv('data/head_resurvey_paired.csv') |> 
+head <- read_csv('data/pannonian_sands_resurvey_head.csv') |> 
   filter(!is.na(rs_plot) & time == 'old') |> 
   arrange(releve_nr)
 
-spe <- read_csv('data/spe_resurvey_paired.csv') |> 
+spe <- read_csv('data/pannonian_sands_resurvey_spe.csv') |> 
   semi_join(head) |> 
   group_by(valid_name) |> 
   mutate(n = n()) |> 
@@ -104,7 +105,7 @@ spe_pcoa |>
 
 # save final classification -----------------------------------------------
 
-iso.1$flat$level.1 |> 
+iso.1$flat$lev.1 |> 
   as_tibble(rownames = 'releve_nr') |> 
   rename('cluster' ='value') |> 
   mutate(cluster = case_when(cluster == 1 ~ 'Armerion', 

@@ -1,8 +1,8 @@
-# Klinkovská et al. (2025) Preslia: Vegetation remains, specialists fade: changes in Pannonian sand grasslands
+# Friesová et al. (2025) Preslia: Vegetation remains, specialists fade: changes in Pannonian sand grasslands
 
 ## Supplementary code and data to the article:
 
-Klinkovská, K., Axmanová, I., Borovyk, D., Ćuk, M., Kopčan, B., Valachovič, M., Clark, A. T. & Chytrý, M. (2025) Vegetation remains, specialists fade: changes in Pannonian sand grasslands. Preslia.
+Friesová, K., Axmanová, I., Borovyk, D., Ćuk, M., Kopčan, B., Valachovič, M., Clark, A. T. & Chytrý, M. (2025) Vegetation remains, specialists fade: changes in Pannonian sand grasslands. Preslia.
 
 ### Data
 
