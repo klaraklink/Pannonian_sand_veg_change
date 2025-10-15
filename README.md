@@ -27,7 +27,7 @@ The data on species composition, environmental variables and species characteris
 
 The data on resurveyed vegetation plots are also stored in the ReSurveyEurope database (CZ_0039, Knollová et al. 2024; <http://euroveg.org/eva-database-re-survey-europe>).
 
-\### Scripts
+### Scripts
 
 -   `1_classification.R`: Classification of the historical vegetation plots into three vegetation types (pioneer sand vegetation, closed acidophilous and ruderalized sand grasslands and closed basiphilous sand grasslands)
 -   `2_ordinations.R`: Changes in species composition using PCoA and db-RDA.
